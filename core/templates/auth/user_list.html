@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %} 
+{% block content %}
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="table-primary">
+            <tr>
+                <th scope="col"><span id="broj">#</span></th>
+                <th scope="col"><span id="korisnik">Корисник</span></th>
+                <th scope="col"><span id="mejl">Мејл</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for object in object_list %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td><a href="{{ object.get_absolute_url }}">{{ object.username }}</a></td>
+                <td>{{ object.email }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

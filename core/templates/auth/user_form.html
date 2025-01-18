@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<h4>{% if is_create %}Додај{% else %}Измени{% endif %} корисника</h4>
+
+<form method="POST" class="mb-3">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-primary">Сачувај</button>
+        {% if not is_create %}
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            Обриши
+        </button>
+        {% endif %}
+    </div>
+</form>
+
+{% if not is_create %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Потврди брисање</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Да ли си сигуран да желиш да корисника "{{ object.username }}"?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Не</button>
+                <button type="button" id="confirmDelete" class="btn btn-danger">Да</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('confirmDelete').addEventListener('click', function () {
+        const deleteUrl = `{% url 'korisnici:korisnik-delete' pk=object.pk %}`;
+        fetch(deleteUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = "{% url 'korisnici:korisnik-list' %}";
+            } else {
+                return response.text().then(text => { throw new Error(text); });
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting book:', error);
+            alert('Failed to delete the book. Please try again.');
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

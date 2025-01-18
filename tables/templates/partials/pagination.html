@@ -1,0 +1,87 @@
+
+<div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item">
+                <form method="get">
+                    <select name="paginate_by" id="paginateBy" class="form-select" onchange="this.form.submit()">
+                        <option value="10" {% if request.GET.paginate_by == '10' %}selected{% endif %}>10</option>
+                        <option value="25" {% if request.GET.paginate_by == '25' %}selected{% endif %}>25</option>
+                        <option value="50" {% if request.GET.paginate_by == '50' %}selected{% endif %}>50</option>
+                        <option value="100" {% if request.GET.paginate_by == '100' %}selected{% endif %}>100</option>
+                    </select>
+                </form>
+            </li>  
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?paginate_by={{ request.GET.paginate_by|default:"10" }}&page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&lsaquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% if request.GET.show_all_pages != 'true' %}
+                {% with page_obj.number|add:-2 as start_page %}
+                {% with page_obj.number|add:2 as end_page %}
+                    {% if start_page < 1 %}
+                        {% with 1 as start_page %}
+                        {% with 5 as end_page %}
+                        {% endwith %}
+                        {% endwith %}
+                    {% endif %}
+                    {% if end_page > page_obj.paginator.num_pages %}
+                        {% with page_obj.paginator.num_pages as end_page %}
+                        {% with end_page|add:-6 as start_page %}
+                        {% endwith %}
+                        {% endwith %}
+                    {% endif %}
+
+                    {% if start_page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="?paginate_by={{ request.GET.paginate_by|default:"10" }}&page=1">1</a>
+                        </li>
+                        {% if start_page > 2 %}
+                            <li class="page-item">
+                                <a class="page-link" href="?paginate_by={{ request.GET.paginate_by|default:"10" }}&show_all_pages=true">...</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+
+                    {% for page_num in page_obj.paginator.page_range %}
+                        {% if page_num >= start_page and page_num <= end_page %}
+                            <li class="page-item {% if page_obj.number == page_num %}active{% endif %}">
+                                <a class="page-link" href="?paginate_by={{ request.GET.paginate_by|default:"10" }}&page={{ page_num }}">{{ page_num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if end_page < page_obj.paginator.num_pages %}
+                        {% if end_page < page_obj.paginator.num_pages|add:-1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="?paginate_by={{ request.GET.paginate_by|default:"10" }}&show_all_pages=true">...</a>
+                        </li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a class="page-link" href="?paginate_by={{ request.GET.paginate_by|default:"10" }}&page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+                        </li>
+                    {% endif %}
+                {% endwith %}
+                {% endwith %}
+            {% else %}
+                {% for page_num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == page_num %}active{% endif %}">
+                        <a class="page-link" href="?paginate_by={{ request.GET.paginate_by|default:"10" }}&page={{ page_num }}">{{ page_num }}</a>
+                    </li>
+                {% endfor %}
+            {% endif %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?paginate_by={{ request.GET.paginate_by|default:"10" }}&page={{ page_obj.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&rsaquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>

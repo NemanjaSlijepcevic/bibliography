@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<h4>{% if is_create %}Додај{% else %}Измени{% endif %} корисника</h4>
+
+<form method="POST" class="mb-3">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-primary">Сачувај</button>
+    </div>
+</form>
+
+{% endblock %}
