@@ -61,8 +61,9 @@ class BookListView(ListView):
         if authors:
             queryset = (
                 queryset.filter(author__id__in=authors)
-            )     
+            )
         return queryset
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['authors'] = Author.objects.all()

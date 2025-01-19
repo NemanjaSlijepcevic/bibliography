@@ -84,7 +84,11 @@
             {% for book in page_obj %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ book.author }}</td>
+                <td>
+                    {% for author in book.author.all %}
+                        {{ author.name }}, 
+                    {% endfor %}
+                </td>
                 <td>{% if request.user.is_authenticated %}
                     <a href="{{ book.get_absolute_url }}">{% endif %}
                         {{ book.title }}

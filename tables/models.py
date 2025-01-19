@@ -49,7 +49,7 @@ class Category(models.Model):
         return self.name
 
 class Book(models.Model):
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    author = models.ManyToManyField(Author, blank=False)
     title = models.CharField(max_length=80)
     publisher = models.ForeignKey(Publisher, on_delete=models.SET_NULL, null=True, blank=True)
     place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True)
@@ -60,10 +60,11 @@ class Book(models.Model):
     edited_by = models.ForeignKey(User, on_delete=models.SET_NULL,default=1, blank=True, null=True, related_name='book_edited')
 
     class Meta:
-        ordering = ('author', 'title')
+        ordering = ('author__name', 'title')
 
     def __str__(self):
-        return self.author.name + ": " +self.title
+        author_names = ', '.join([author.name for author in self.author.all()])
+        return f"{author_names}: {self.title}"
 
     def get_absolute_url(self):
         return  reverse("books:book-update", kwargs={"pk": self.id})

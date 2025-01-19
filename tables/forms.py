@@ -19,6 +19,10 @@ class BookForm(forms.ModelForm):
             'category',
         ]
 
+        widgets = {
+            'category': forms.CheckboxSelectMultiple(),
+        }
+
         labels = {
             'author': _('Author'),
             'title': _('Title'),
@@ -28,12 +32,12 @@ class BookForm(forms.ModelForm):
             'category': _('Category')    
         }
 
-    def clean_author_name(self):
-        author_name = self.cleaned_data.get("author_name")
-        if author_name:
-            author, created = Author.objects.get_or_create(name=author_name)
-            self.cleaned_data['author'] = author
-        return author_name
+    # def clean_author(self):
+    #     author = self.cleaned_data.get("author")
+    #     if author:
+    #         author, created = Author.objects.get_or_create(name=author)
+    #         self.cleaned_data['author'] = author
+    #     return author_name
 
     def clean_year(self):
         year = self.cleaned_data.get("year")
