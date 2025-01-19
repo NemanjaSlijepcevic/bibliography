@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-13 12:50+0100\n"
+"POT-Creation-Date: 2025-01-19 12:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,33 +19,38 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: .\tables\forms.py:23 .\tables\templates\tables\book_list.html:15
+#: .\tables\forms.py:27 .\tables\templates\tables\book_list.html:40
+#: .\tables\templates\tables\book_list.html:75
 msgid "Author"
 msgstr "Аутор"
 
-#: .\tables\forms.py:24 .\tables\templates\tables\book_list.html:16
+#: .\tables\forms.py:28 .\tables\templates\tables\book_list.html:76
 msgid "Title"
 msgstr "Наслов"
 
-#: .\tables\forms.py:25 .\tables\templates\tables\book_list.html:17
+#: .\tables\forms.py:29 .\tables\templates\tables\book_list.html:77
 msgid "Publisher"
 msgstr "Издавач"
 
-#: .\tables\forms.py:26 .\tables\templates\tables\book_list.html:18
+#: .\tables\forms.py:30 .\tables\templates\tables\book_list.html:78
 msgid "Place"
 msgstr "Место"
 
-#: .\tables\forms.py:27 .\tables\templates\tables\book_list.html:19
+#: .\tables\forms.py:31 .\tables\templates\tables\book_list.html:79
 msgid "Year"
 msgstr "Година"
 
-#: .\tables\forms.py:28 .\tables\templates\tables\book_list.html:20
+#: .\tables\forms.py:32 .\tables\templates\tables\book_list.html:80
 msgid "Category"
 msgstr "Област"
 
-#: .\tables\templates\partials\filters.html:5
-msgid "Filters"
-msgstr "Филтери"
+#: .\tables\forms.py:43
+msgid "A book with the title already exists for one of the selected authors."
+msgstr "Књига са овим насловом већ постоји код једног од поменутих аутора."
+
+#: .\tables\forms.py:52
+msgid "Not a valid year"
+msgstr "Непостојећа година"
 
 #: .\tables\templates\tables\book_form.html:6
 msgid "Create book"
@@ -78,6 +83,10 @@ msgstr "Не"
 #: .\tables\templates\tables\book_form.html:34
 msgid "Yes"
 msgstr "Да"
+
+#: .\tables\templates\tables\book_list.html:11
+msgid "Filters"
+msgstr "Филтери"
 
 #~ msgid "Tags"
 #~ msgstr "Области"

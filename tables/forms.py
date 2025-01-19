@@ -32,17 +32,22 @@ class BookForm(forms.ModelForm):
             'category': _('Category')    
         }
 
-    # def clean_author(self):
-    #     author = self.cleaned_data.get("author")
-    #     if author:
-    #         author, created = Author.objects.get_or_create(name=author)
-    #         self.cleaned_data['author'] = author
-    #     return author_name
+    def clean_title(self):
+        title = self.cleaned_data.get('title')
+        authors = self.cleaned_data.get('author')
+
+        if title and authors:
+            existing_books = Book.objects.filter(title__iexact=title)
+            for book in existing_books:
+                if book.author.filter(id__in=[author.id for author in authors]).exists():
+                    raise forms.ValidationError(_("A book with the title already exists for one of the selected authors."))
+        
+        return title
 
     def clean_year(self):
         year = self.cleaned_data.get("year")
         if year:
             year_value = year.name
             if year_value > date.today().year or year_value < 0:
-                raise forms.ValidationError("Not a valid year")
+                raise forms.ValidationError(_("Not a valid year"))
         return year
