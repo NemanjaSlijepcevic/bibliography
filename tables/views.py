@@ -1,5 +1,6 @@
 from django.urls import reverse_lazy
 from django.db.models import Count
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (
     CreateView,
@@ -31,13 +32,18 @@ class BookDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("books:book-list")
     def dispatch(self, request, *args, **kwargs):
         if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            self.object = self.get_object()
-            self.object.delete()
-            return JsonResponse({"message": "Book deleted successfully"}, status=200)
+            try:
+                self.object = self.get_object()
+                self.object.delete()
+                return JsonResponse({"message": _("Book deleted successfully")}, status=200)
+            except ObjectDoesNotExist:
+                return JsonResponse({"error": _("Book not found")}, status=404)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=500)
         return super().dispatch(request, *args, **kwargs)
 
 class BookDetailView(DetailView):
-    queryset = Book.objects.all()
+    model = Book
 
 class BookListView(ListView):
 
