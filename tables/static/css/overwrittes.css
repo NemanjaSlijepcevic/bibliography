@@ -1,0 +1,7 @@
+#loading-spinner {
+    display: none !important;
+}
+
+#loading-spinner.active {
+    display: flex !important;
+}

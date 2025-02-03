@@ -1,7 +1,12 @@
 from django.urls import reverse_lazy
-from django.db.models import Count
+from django.db.models import Count, Q, Prefetch
+from django.http import JsonResponse, HttpRequest, HttpResponse
+from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import View
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -9,32 +14,89 @@ from django.views.generic import (
     ListView,
     UpdateView
 )
-from .forms import BookForm
+from .forms import AuthorForm, BookForm
 from .models import Author, Book, Category
+
+
+class AuthorCheckView(LoginRequiredMixin, View):
+    template_name = "tables/check_author.html"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        return render(request, self.template_name, {"form": AuthorForm()})
+
+    def post(self, request: HttpRequest) -> JsonResponse:
+        author_name = request.POST.get("author", "").strip()
+        authors = Author.objects.filter(name__icontains=author_name)
+
+        if not authors.exists():
+            return JsonResponse({"exists": False, "books": [], "authors": []})
+
+        authors_list = list(authors.values_list("name", flat=True))
+        books_by_author = {
+            author.name: list(author.book_set.values_list("title", flat=True))
+            for author in authors
+        }
+
+        return JsonResponse({
+            "exists": True,
+            "books": books_by_author,
+            "authors": authors_list
+        })
+
+
+class BookSearchView(LoginRequiredMixin, View):
+    template_name = "tables/check_universal.html"
+    def get(self, request: HttpRequest) -> HttpResponse:
+        return render(request, self.template_name, {"form": BookForm()})
+
+    def post(self, request: HttpRequest) -> JsonResponse:
+        search_text = request.POST.get("search-field", "").strip()
+        books = Book.objects.filter(
+            Q(title__icontains=search_text)
+            | Q(author__name__icontains=search_text)
+            | Q(publisher__name__icontains=search_text)
+            | Q(category__name__icontains=search_text)
+        ).distinct()
+
+        if not books.exists():
+            return JsonResponse({"exists": False, "books": []})
+
+        books_data = [
+            {
+                "title": book.title,
+                "authors": list(book.author.values_list("name", flat=True)),
+                "categories": list(book.category.values_list("name", flat=True)),
+                "publisher": book.publisher.name if book.publisher else "",
+            }
+            for book in books
+        ]
+
+        return JsonResponse({"exists": True, "books": books_data})
 
 
 class BookCreateView(LoginRequiredMixin, CreateView):
     model = Book
     form_class = BookForm
+    success_url = reverse_lazy("books:book-create")
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
-    success_url = reverse_lazy("books:book-create")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['is_create'] = True
+        context["is_create"] = True
         return context
 
 class BookDeleteView(LoginRequiredMixin, DeleteView):
     model = Book
     success_url = reverse_lazy("books:book-list")
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
             try:
-                self.object = self.get_object()
-                self.object.delete()
+                obj = self.get_object()
+                obj.delete()
                 return JsonResponse({"message": _("Book deleted successfully")}, status=200)
             except ObjectDoesNotExist:
                 return JsonResponse({"error": _("Book not found")}, status=404)
@@ -46,47 +108,80 @@ class BookDetailView(DetailView):
     model = Book
 
 class BookListView(ListView):
-
-    def get_paginate_by(self, queryset):
-        return self.request.GET.get('paginate_by', 10)
+    model = Book
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = Book.objects.all()
-        categories = self.request.GET.getlist('categories')
-        authors = self.request.GET.getlist('authors')
-        
+        categories = self.request.GET.getlist("categories")
         if categories:
-            print(categories)
             queryset = (
                 queryset.filter(category__id__in=categories)
                 .annotate(num_categories=Count('category'))
                 .filter(num_categories=len(categories))
+                .distinct()
             )
-            print(queryset)
-
-        if authors:
-            queryset = (
-                queryset.filter(author__id__in=authors)
-            )
+        queryset = queryset.prefetch_related(
+            Prefetch('author', queryset=Author.objects.only('name')),
+            Prefetch('category', queryset=Category.objects.only('name')),
+        ).select_related('publisher', 'place', 'year')
+        
         return queryset
 
+    def get(self, request, *args, **kwargs):
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            books = self.get_queryset()
+            paginate_by = request.GET.get("paginate_by", "10")
+
+            if paginate_by == "all":
+                page_obj = books
+                total_pages = 1
+            else:
+                paginate_by = int(paginate_by)
+                paginator = Paginator(books, paginate_by)
+                page_number = request.GET.get("page", 1)
+                page_obj = paginator.get_page(page_number)
+                total_pages = paginator.num_pages
+            data = [
+                {
+                    "id": book.pk,
+                    "title": book.title,
+                    "authors": [author.name for author in book.author.all()],
+                    "publisher": book.publisher.name if book.publisher else "",
+                    "place": book.place.name if book.place else "" ,
+                    "year": book.year.name if book.year else "" ,
+                    "categories": [category.name for category in book.category.all()],
+                    "detail_url": book.get_absolute_url(),
+                }
+                for book in page_obj
+            ]
+
+            return JsonResponse({
+                "books": data,
+                "has_next": getattr(page_obj, "has_next", lambda: False)(),
+                "current_page": getattr(page_obj, "number", 1),
+                "total_pages": total_pages
+            }, safe=False)
+        return super().get(request, *args, **kwargs)
+  
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['authors'] = Author.objects.all()
-        context['categories'] = Category.objects.all()
-        context['selected_authors'] = [int(a) for a in self.request.GET.getlist('authors')]
-        context['selected_categories'] = [int(c) for c in self.request.GET.getlist('categories')]
+        context = super().get_context_data(**kwargs) | {
+            "categories": Category.objects.all(),
+            "selected_categories": [int(c) for c in self.request.GET.getlist("categories")],            
+        }
         return context
 
 class BookUpdateView(LoginRequiredMixin, UpdateView):
     model = Book
     form_class = BookForm
     success_url = reverse_lazy("books:book-list")
+
     def form_valid(self, form):
         form.instance.edited_by = self.request.user
         return super().form_valid(form)
+
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['is_create'] = False
-        context['object'] = self.get_object()
-        return context
+        return super().get_context_data(**kwargs) | {
+            "is_create": False,
+            "object": self.get_object(),
+        }

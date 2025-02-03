@@ -6,6 +6,11 @@ from .models import (
 )
 from datetime import date
 
+class AuthorForm(forms.ModelForm):
+    class Meta:
+        model = Author
+        fields = ['name']
+        labels = {'name': 'Name'}
 
 class BookForm(forms.ModelForm):
     class Meta:
@@ -31,18 +36,6 @@ class BookForm(forms.ModelForm):
             'year': _('Year'),
             'category': _('Category')    
         }
-
-    def clean_title(self):
-        title = self.cleaned_data.get('title')
-        authors = self.cleaned_data.get('author')
-
-        if title and authors:
-            existing_books = Book.objects.filter(title__iexact=title)
-            for book in existing_books:
-                if book.author.filter(id__in=[author.id for author in authors]).exists():
-                    raise forms.ValidationError(_("A book with the title already exists for one of the selected authors."))
-        
-        return title
 
     def clean_year(self):
         year = self.cleaned_data.get("year")

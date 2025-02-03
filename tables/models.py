@@ -49,12 +49,12 @@ class Category(models.Model):
         return self.name
 
 class Book(models.Model):
-    author = models.ManyToManyField(Author, blank=False)
+    author = models.ManyToManyField(Author, blank=False, db_index=True)
     title = models.CharField(max_length=80)
-    publisher = models.ForeignKey(Publisher, on_delete=models.SET_NULL, null=True, blank=True)
-    place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True)
-    year = models.ForeignKey(Year, on_delete=models.SET_NULL, null=True, blank=True)
-    category = models.ManyToManyField(Category, blank=True)
+    publisher = models.ForeignKey(Publisher, on_delete=models.SET_NULL, null=True, blank=True, db_index=True)
+    place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True, blank=True, db_index=True)
+    year = models.ForeignKey(Year, on_delete=models.SET_NULL, null=True, blank=True, db_index=True)
+    category = models.ManyToManyField(Category, blank=True, db_index=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_DEFAULT,default=1, related_name='book_created')
     created_at = models.DateTimeField(auto_now_add=True)
     edited_by = models.ForeignKey(User, on_delete=models.SET_NULL,default=1, blank=True, null=True, related_name='book_edited')
@@ -63,7 +63,9 @@ class Book(models.Model):
         ordering = ('author__name', 'title')
 
     def __str__(self):
-        author_names = ', '.join([author.name for author in self.author.all()])
+        author_names = ', '.join([author.name for author in self.author.all()][:3])
+        if self.author.count() > 3:
+            author_names += '...'
         return f"{author_names}: {self.title}"
 
     def get_absolute_url(self):

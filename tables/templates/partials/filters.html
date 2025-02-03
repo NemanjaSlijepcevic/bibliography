@@ -1,0 +1,26 @@
+{% load i18n %}
+<div class="accordion" id="accordionFlushExample">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                <b>{% trans "Filters" %}</b>
+            </button>
+        </h2>
+        <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+            <div class="accordion-body">
+                <form id="category-filter-form" method="get">
+                    {% for category in categories %}
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="category-{{ category.id }}"
+                            name="categories" value="{{ category.id }}" {% if category.id in selected_categories %}checked{% endif %}>
+                        <label class="form-check-label" for="category-{{ category.id }}">
+                            {{ category.name }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

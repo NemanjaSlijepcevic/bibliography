@@ -1,144 +1,16 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% load django_bootstrap5 %} 
+{% load django_bootstrap5 %}
+{% load static %} 
 {% block content %}
-
-
-<div class="accordion" id="accordionFlushExample">
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-            <b>{% trans "Filters" %}</b>
-        </button>
-      </h2>
-      <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-        <div class="accordion-body">
-            <form id="category-filter-form" method="get">
-                {% for category in categories %}
-                    <div class="form-check form-check-inline">
-                        <input 
-                            class="form-check-input" 
-                            type="checkbox" 
-                            id="category-{{ category.id }}" 
-                            name="categories" 
-                            value="{{ category.id }}" 
-                            {% if category.id in selected_categories %}checked{% endif %}>
-                        <label
-                            class="form-check-label" 
-                            for="category-{{ category.id }}">
-                                {{ category.name }}
-                        </label>
-                    </div>
-                {% endfor %}
-            </form>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-        <h2 class="accordion-header">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-              <b>{% trans "Author" %}</b>
-          </button>
-        </h2>
-        <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-          <div class="accordion-body">
-              <form id="author-filter-form" method="get">
-                  {% for author in authors %}
-                      <div class="form-check form-check-inline">
-                          <input 
-                              class="form-check-input" 
-                              type="checkbox" 
-                              id="author-{{ author.id }}" 
-                              name="authors" 
-                              value="{{ author.id }}" 
-                              {% if author.id in selected_authors %}checked{% endif %}>
-                          <label
-                              class="form-check-label" 
-                              for="author-{{ author.id }}">
-                                  {{ author.name }}
-                          </label>
-                      </div>
-                  {% endfor %}
-              </form>
-          </div>
-        </div>
-    </div>
-</div>
-
+    
+    
+{% include 'partials/filters.html' %}
 {% include 'partials/pagination.html' %}
+{% include 'partials/book_table.html' %}
 
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead class="table-primary">
-            <tr>
-                <th scope="col"><span id="number">#</span></th>
-                <th scope="col"><span id="author">{% trans "Author" %}</span></th>
-                <th scope="col"><span id="title">{% trans "Title" %}</span></th>
-                <th scope="col"><span id="publisher">{% trans "Publisher" %}</span></th>
-                <th scope="col"><span id="Place">{% trans "Place" %}</span></th>
-                <th scope="col"><span id="year">{% trans "Year" %}</span></th>
-                <th scope="col"><span id="tag">{% trans "Category" %}</span></th>      
-            </tr>
-        </thead>
-        <tbody>
-            {% for book in page_obj %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>
-                    {% for author in book.author.all %}
-                        {{ author.name }}, 
-                    {% endfor %}
-                </td>
-                <td>{% if request.user.is_authenticated %}
-                    <a href="{{ book.get_absolute_url }}">{% endif %}
-                        {{ book.title }}
-                    {% if request.user.is_authenticated %}</a>{% endif %}
-                </td>
-                <td>{{ book.publisher }}</td>
-                <td>{{ book.place }}</td>
-                <td>{{ book.year }}</td>
-                <td>
-                    {% for category in book.category.all %}
-                        {{ category.name }}, 
-                    {% endfor %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+{% endblock %}
 
-{% include 'partials/pagination.html' %}
-
-<script>
-    const updateFilters = (form) => {
-        const formData = new FormData(form);
-        const queryParams = new URLSearchParams(window.location.search);
-
-        // Get the keys related to the current form
-        const formKeys = Array.from(new Set([...formData.keys(), ...Array.from(form.elements).map(el => el.name)]));
-
-        // Update query parameters based on the current form
-        formKeys.forEach((key) => {
-            const formValues = formData.getAll(key); // Get values for the key from the form
-            queryParams.delete(key); // Remove all current values for the key
-
-            // If the key has values, add them back to the query params
-            if (formValues.length > 0) {
-                formValues.forEach((value) => queryParams.append(key, value));
-            }
-        });
-
-        // Redirect with updated query string
-        window.location.href = `?${queryParams.toString()}`;
-    };
-
-    const categoryForm = document.getElementById('category-filter-form');
-    const authorForm = document.getElementById('author-filter-form');
-
-    categoryForm.addEventListener('change', () => updateFilters(categoryForm));
-    authorForm.addEventListener('change', () => updateFilters(authorForm));
-</script>
-
-
+{% block scripts %}
+<script type="module" src="{% static 'js/books.js' %}"></script>
 {% endblock %}

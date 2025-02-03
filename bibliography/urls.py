@@ -17,8 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 import bibliography.settings
+from tables.views import  BookListView
 
 urlpatterns = [
+    path('',  BookListView.as_view(), name='home'),
     path('admin/', admin.site.urls),
     path('book/', include('tables.urls')),
     path('korisnici/', include('core.urls')),

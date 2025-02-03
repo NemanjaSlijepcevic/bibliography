@@ -1,0 +1,26 @@
+{% load i18n %}
+
+
+<div id="loading-spinner" class="d-flex justify-content-center" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="table-primary">
+            <tr>
+                <th scope="col"><span id="number">#</span></th>
+                <th scope="col"><span id="author">{% trans "Author" %}</span></th>
+                <th scope="col"><span id="title">{% trans "Title" %}</span></th>
+                <th scope="col"><span id="publisher">{% trans "Publisher" %}</span></th>
+                <th scope="col"><span id="Place">{% trans "Place" %}</span></th>
+                <th scope="col"><span id="year">{% trans "Year" %}</span></th>
+                <th scope="col"><span id="tag">{% trans "Category" %}</span></th>
+            </tr>
+        </thead>
+        <tbody id="book-table-body">
+        </tbody>
+    </table>
+</div>
