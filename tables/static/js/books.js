@@ -1,10 +1,23 @@
-import { fetchBooks } from "./fetchBooks.js";
 import { updatePagination } from "./pagination.js";
 
 document.addEventListener("DOMContentLoaded", function () {
+    let currentSort = { column: null, order: "asc" };
     const categoryForm = document.getElementById("category-filter-form");
     const paginationContainer = document.getElementById("pagination-container");
     const paginateSelect = document.getElementById("paginateBy");
+
+    document.querySelectorAll("th[data-sort]").forEach(header => {
+        header.addEventListener("click", function () {
+            const column = this.getAttribute("data-sort");
+            if (currentSort.column === column) {
+                currentSort.order = currentSort.order === "asc" ? "desc" : "asc";
+            } else {
+                currentSort.column = column;
+                currentSort.order = "asc";
+            }
+            fetchAndRenderBooks(1);
+        });
+    });
 
     if (!categoryForm) {
         console.error("Category filter form not found!");
@@ -34,17 +47,33 @@ document.addEventListener("DOMContentLoaded", function () {
     function fetchAndRenderBooks(page = 1) {
         showSpinner();
     
-        fetchBooks(page, getSelectedCategories(), paginateSelect.value)
+        const params = new URLSearchParams();
+        params.set("page", page);
+        params.set("paginate_by", document.getElementById("paginateBy").value);
+        
+        const selectedCategories = getSelectedCategories();
+        selectedCategories.forEach(category => params.append("categories", category));
+
+        if (currentSort.column) {
+            params.set("sort", currentSort.column);
+            params.set("order", currentSort.order);
+        }
+
+        fetch(window.location.pathname + "?" + params.toString(), {
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+            .then(response => response.json())
             .then(data => {
                 updateTable(data.books);
-                updatePagination(paginationContainer, data.has_next, data.current_page, data.total_pages);
+                updatePagination(
+                    document.getElementById("pagination-container"),
+                    data.has_next,
+                    data.current_page,
+                    data.total_pages
+                );
             })
-            .catch(error => {
-                console.error("Error fetching books:", error);
-            })
-            .finally(() => {
-                hideSpinner();
-            });
+            .catch(error => console.error("Error fetching books:", error))
+            .finally(() => hideSpinner());
     }
 
     function getSelectedCategories() {

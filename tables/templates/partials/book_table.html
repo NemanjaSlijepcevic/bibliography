@@ -3,21 +3,22 @@
 
 <div id="loading-spinner" class="d-flex justify-content-center" style="display: none;">
     <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+        <span class="visually-hidden">Loading...
     </div>
 </div>
 
+{% include 'partials/pagination.html' %}
 <div class="table-responsive" id="book-table">
-    <table class="table table-striped">
+    <table class="table table-striped border">
         <thead class="table-primary">
             <tr>
-                <th scope="col"><span id="number">#</span></th>
-                <th scope="col"><span id="author">{% trans "Author" %}</span></th>
-                <th scope="col"><span id="title">{% trans "Title" %}</span></th>
-                <th scope="col"><span id="publisher">{% trans "Publisher" %}</span></th>
-                <th scope="col"><span id="Place">{% trans "Place" %}</span></th>
-                <th scope="col"><span id="year">{% trans "Year" %}</span></th>
-                <th scope="col"><span id="tag">{% trans "Category" %}</span></th>
+                <th scope="col" data-sort="id">#</th>
+                <th scope="col" data-sort="author">{% trans "Author" %}</th>
+                <th scope="col" data-sort="title">{% trans "Title" %}</th>
+                <th scope="col" data-sort="publisher">{% trans "Publisher" %}</th>
+                <th scope="col" data-sort="place">{% trans "Place" %}</th>
+                <th scope="col" data-sort="year">{% trans "Year" %}</th>
+                <th scope="col" data-sort="tag">{% trans "Category" %}</th>
             </tr>
         </thead>
         <tbody id="book-table-body">

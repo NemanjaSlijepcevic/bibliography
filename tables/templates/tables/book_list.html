@@ -4,9 +4,10 @@
 {% load static %} 
 {% block content %}
     
-    
-{% include 'partials/filters.html' %}
-{% include 'partials/pagination.html' %}
+<div class="shadow-none p-3 mb-3 bg-body-tertiary rounded border">
+    {% include 'partials/filters.html' %}
+</div>
+
 {% include 'partials/book_table.html' %}
 
 {% endblock %}

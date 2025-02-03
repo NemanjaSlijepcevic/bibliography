@@ -121,6 +121,25 @@ class BookListView(ListView):
                 .filter(num_categories=len(categories))
                 .distinct()
             )
+
+        sort_column = self.request.GET.get("sort", "id")
+        order = self.request.GET.get("order", "asc")
+
+        sort_mapping = {
+            "author": "author__name",
+            "title": "title",
+            "publisher": "publisher__name",
+            "place": "place__name",
+            "year": "year",
+            "category": "category__name"
+        }
+
+        if sort_column in sort_mapping:
+            sort_field = sort_mapping[sort_column]
+            if order == "desc":
+                sort_field = f"-{sort_field}"
+            queryset = queryset.order_by(sort_field)
+
         queryset = queryset.prefetch_related(
             Prefetch('author', queryset=Author.objects.only('name')),
             Prefetch('category', queryset=Category.objects.only('name')),

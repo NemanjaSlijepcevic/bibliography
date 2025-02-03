@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-31 10:31+0100\n"
+"POT-Creation-Date: 2025-02-03 12:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,39 +19,54 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: .\tables\forms.py:32 .\tables\templates\tables\book_list.html:40
-#: .\tables\templates\tables\book_list.html:75
+#: .\tables\forms.py:32 .\tables\templates\partials\book_table.html:16
 #: .\tables\templates\tables\check_author.html:8
 msgid "Author"
 msgstr "Аутор"
 
-#: .\tables\forms.py:33 .\tables\templates\tables\book_list.html:76
+#: .\tables\forms.py:33 .\tables\templates\partials\book_table.html:17
 msgid "Title"
 msgstr "Наслов"
 
-#: .\tables\forms.py:34 .\tables\templates\tables\book_list.html:77
+#: .\tables\forms.py:34 .\tables\templates\partials\book_table.html:18
 msgid "Publisher"
 msgstr "Издавач"
 
-#: .\tables\forms.py:35 .\tables\templates\tables\book_list.html:78
+#: .\tables\forms.py:35 .\tables\templates\partials\book_table.html:19
 msgid "Place"
 msgstr "Место"
 
-#: .\tables\forms.py:36 .\tables\templates\tables\book_list.html:79
+#: .\tables\forms.py:36 .\tables\templates\partials\book_table.html:20
 msgid "Year"
 msgstr "Година"
 
-#: .\tables\forms.py:37 .\tables\templates\tables\book_list.html:80
+#: .\tables\forms.py:37 .\tables\templates\partials\book_table.html:21
 msgid "Category"
 msgstr "Област"
 
-#: .\tables\forms.py:48
-msgid "A book with the title already exists for one of the selected authors."
-msgstr "Књига са овим насловом већ постоји код једног од поменутих аутора."
-
-#: .\tables\forms.py:57
+#: .\tables\forms.py:45
 msgid "Not a valid year"
 msgstr "Непостојећа година"
+
+#: .\tables\templates\partials\filters.html:5
+#: .\tables\templates\partials\navbar.html:22
+#: .\tables\templates\tables\check_universal.html:8
+msgid "Search"
+msgstr "Претраживање"
+
+#: .\tables\templates\partials\filters.html:6
+msgid "Search books"
+msgstr "Претраживање књига"
+
+#: .\tables\templates\partials\filters.html:7
+#: .\tables\templates\tables\check_author.html:10
+#: .\tables\templates\tables\check_universal.html:10
+msgid "Check"
+msgstr "Провера"
+
+#: .\tables\templates\partials\filters.html:16
+msgid "Categories"
+msgstr "Области"
 
 #: .\tables\templates\partials\navbar.html:5
 msgid "Gacko bibliography"
@@ -69,11 +84,6 @@ msgstr "Додавање"
 msgid "Authors"
 msgstr "Аутори"
 
-#: .\tables\templates\partials\navbar.html:22
-#: .\tables\templates\tables\check_universal.html:8
-msgid "Search"
-msgstr "Претраживање"
-
 #: .\tables\templates\partials\navbar.html:25
 msgid "Logout"
 msgstr "Одјава"
@@ -81,6 +91,10 @@ msgstr "Одјава"
 #: .\tables\templates\partials\navbar.html:30
 msgid "Greatest list of books relevat for Gacko"
 msgstr "Највећа колекција књига везаних за Гацко"
+
+#: .\tables\templates\partials\pagination.html:9
+msgid "All"
+msgstr "Све"
 
 #: .\tables\templates\tables\book_form.html:6
 msgid "Create book"
@@ -114,30 +128,28 @@ msgstr "Не"
 msgid "Yes"
 msgstr "Да"
 
-#: .\tables\templates\tables\book_list.html:11
-msgid "Filters"
-msgstr "Филтери"
-
 #: .\tables\templates\tables\check_author.html:5
 msgid "Check if Author Exists"
 msgstr "Провери да ли аутор постоји."
-
-#: .\tables\templates\tables\check_author.html:10
-#: .\tables\templates\tables\check_universal.html:10
-msgid "Check"
-msgstr "Провера"
 
 #: .\tables\templates\tables\check_universal.html:5
 msgid "Check if Book Exists"
 msgstr "Провери да ли књига постоји."
 
-#: .\tables\views.py:99
+#: .\tables\views.py:100
 msgid "Book deleted successfully"
 msgstr "Књига је успешно обрисана."
 
-#: .\tables\views.py:101
+#: .\tables\views.py:102
 msgid "Book not found"
 msgstr "Књига није нађена."
+
+#~ msgid ""
+#~ "A book with the title already exists for one of the selected authors."
+#~ msgstr "Књига са овим насловом већ постоји код једног од поменутих аутора."
+
+#~ msgid "Filters"
+#~ msgstr "Филтери"
 
 #~ msgid "Tags"
 #~ msgstr "Области"
