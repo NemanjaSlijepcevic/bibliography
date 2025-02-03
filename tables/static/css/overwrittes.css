@@ -2,6 +2,14 @@
     display: none !important;
 }
 
-#loading-spinner.active {
+#loading-spinner.loading {
     display: flex !important;
+}
+
+#book-table {
+    display: flex !important;
+}
+
+#book-table.loading {
+    display: none !important;
 }

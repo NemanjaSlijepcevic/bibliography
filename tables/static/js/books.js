@@ -53,11 +53,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function showSpinner() {
-        document.getElementById("loading-spinner").classList.add("active");
+        document.getElementById("loading-spinner").classList.add("loading");
+        document.getElementById("book-table").classList.add("loading");
     }
     
     function hideSpinner() {
-        document.getElementById("loading-spinner").classList.remove("active");
+        document.getElementById("loading-spinner").classList.remove("loading");
+        document.getElementById("book-table").classList.remove("loading");
     }
     
 
