@@ -18,5 +18,4 @@ urlpatterns = [
     path('<int:pk>/delete/', BookDeleteView.as_view(), name='book-delete'),
     path('<int:pk>/update/', BookUpdateView.as_view(), name='book-update'),
     path('author-check/', AuthorCheckView.as_view(), name='author-check'),
-    path('universal-check/', BookSearchView.as_view(), name='universal-check'),
 ]

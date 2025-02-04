@@ -130,7 +130,7 @@ class BookListView(ListView):
             for category_id in categories:
                 queryset = queryset.filter(category__id=category_id)
 
-        if categories and search_text: # Apply distinct only when both filters are applied
+        if categories and search_text:
             queryset = queryset.distinct()
 
 
