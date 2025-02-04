@@ -113,18 +113,29 @@ class BookListView(ListView):
 
     def get_queryset(self):
         queryset = Book.objects.all()
+        search_text = self.request.GET.get("search-field", "").strip()
+
+        if search_text:
+            queryset = queryset.filter(
+                Q(title__icontains=search_text) |
+                Q(author__name__icontains=search_text) |
+                Q(publisher__name__icontains=search_text) |
+                Q(category__name__icontains=search_text) |
+                Q(year__name__icontains=search_text)
+            ).distinct()
+
         categories = self.request.GET.getlist("categories")
+
         if categories:
-            queryset = (
-                queryset.filter(category__id__in=categories)
-                .annotate(num_categories=Count('category'))
-                .filter(num_categories=len(categories))
-                .distinct()
-            )
+            for category_id in categories:
+                queryset = queryset.filter(category__id=category_id)
+
+        if categories and search_text: # Apply distinct only when both filters are applied
+            queryset = queryset.distinct()
+
 
         sort_column = self.request.GET.get("sort", "id")
         order = self.request.GET.get("order", "asc")
-
         sort_mapping = {
             "author": "author__name",
             "title": "title",
@@ -139,12 +150,15 @@ class BookListView(ListView):
             if order == "desc":
                 sort_field = f"-{sort_field}"
             queryset = queryset.order_by(sort_field)
+            print(sort_mapping)
+            print(queryset)
 
+        print('Prefetch')
         queryset = queryset.prefetch_related(
             Prefetch('author', queryset=Author.objects.only('name')),
             Prefetch('category', queryset=Category.objects.only('name')),
         ).select_related('publisher', 'place', 'year')
-        
+        print(queryset)
         return queryset
 
     def get(self, request, *args, **kwargs):
@@ -161,6 +175,7 @@ class BookListView(ListView):
                 page_number = request.GET.get("page", 1)
                 page_obj = paginator.get_page(page_number)
                 total_pages = paginator.num_pages
+
             data = [
                 {
                     "id": book.pk,
@@ -189,6 +204,8 @@ class BookListView(ListView):
             "selected_categories": [int(c) for c in self.request.GET.getlist("categories")],            
         }
         return context
+
+
 
 class BookUpdateView(LoginRequiredMixin, UpdateView):
     model = Book

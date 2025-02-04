@@ -2,9 +2,17 @@ import { updatePagination } from "./pagination.js";
 
 document.addEventListener("DOMContentLoaded", function () {
     let currentSort = { column: null, order: "asc" };
+    const form = document.getElementById('book-search-form');
     const categoryForm = document.getElementById("category-filter-form");
     const paginationContainer = document.getElementById("pagination-container");
     const paginateSelect = document.getElementById("paginateBy");
+    const searchTextInput = document.querySelector('input[name="search-field"]');
+    const resultContainer = document.getElementById("book-table-body");
+    
+    if (!form || !resultContainer || !categoryForm) {
+        console.error("Missing required form elements!");
+        return;
+    }
 
     document.querySelectorAll("th[data-sort]").forEach(header => {
         header.addEventListener("click", function () {
@@ -18,12 +26,6 @@ document.addEventListener("DOMContentLoaded", function () {
             fetchAndRenderBooks(1);
         });
     });
-
-    if (!categoryForm) {
-        console.error("Category filter form not found!");
-        return;
-    }
-
 
     categoryForm.addEventListener("change", function () {
         fetchAndRenderBooks(1);
@@ -43,14 +45,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    searchTextInput.addEventListener("input", function () {
+        fetchAndRenderBooks(1);
+    });
 
     function fetchAndRenderBooks(page = 1) {
         showSpinner();
     
         const params = new URLSearchParams();
         params.set("page", page);
-        params.set("paginate_by", document.getElementById("paginateBy").value);
-        
+        params.set("paginate_by", paginateSelect.value);
+
+        const searchText = searchTextInput.value.trim();
+        if (searchText) {
+            params.set("search-field", searchText);
+        }
+
         const selectedCategories = getSelectedCategories();
         selectedCategories.forEach(category => params.append("categories", category));
 
@@ -62,18 +72,18 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(window.location.pathname + "?" + params.toString(), {
             headers: { "X-Requested-With": "XMLHttpRequest" }
         })
-            .then(response => response.json())
-            .then(data => {
-                updateTable(data.books);
-                updatePagination(
-                    document.getElementById("pagination-container"),
-                    data.has_next,
-                    data.current_page,
-                    data.total_pages
-                );
-            })
-            .catch(error => console.error("Error fetching books:", error))
-            .finally(() => hideSpinner());
+        .then(response => response.json())
+        .then(data => {
+            updateTable(data.books);
+            updatePagination(
+                document.getElementById("pagination-container"),
+                data.has_next,
+                data.current_page,
+                data.total_pages
+            );
+        })
+        .catch(error => console.error("Error fetching books:", error))
+        .finally(() => hideSpinner());
     }
 
     function getSelectedCategories() {
@@ -85,32 +95,26 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("loading-spinner").classList.add("loading");
         document.getElementById("book-table").classList.add("loading");
     }
-    
+
     function hideSpinner() {
         document.getElementById("loading-spinner").classList.remove("loading");
         document.getElementById("book-table").classList.remove("loading");
     }
-    
 
     function updateTable(books) {
-        const tbody = document.getElementById("book-table-body");
-        tbody.innerHTML = "";
-
-        books.forEach((book, index) => {
-            const row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${book.authors.join(", ")}</td>
-                <td><a href="${book.detail_url}">${book.title}</a></td>
-                <td>${book.publisher}</td>
-                <td>${book.place}</td>
-                <td>${book.year}</td>
-                <td>${book.categories.join(", ")}</td>
-            `;
-
-            tbody.appendChild(row);
-        });
+        resultContainer.innerHTML = books.length
+            ? books.map((book, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${book.authors.join(", ")}</td>
+                    <td><a href="${book.detail_url}">${book.title}</a></td>
+                    <td>${book.publisher}</td>
+                    <td>${book.place}</td>
+                    <td>${book.year}</td>
+                    <td>${book.categories.join(", ")}</td>
+                </tr>
+            `).join('')
+            : `<tr><td colspan="7">No books found</td></tr>`;
     }
 
     fetchAndRenderBooks();
