@@ -1,12 +1,12 @@
 from django.urls import path
 from .views import (
-    AuthorCheckView,
+    AuthorAutocomplete,
     BookCreateView,
     BookDeleteView,
     BookDetailView,
     BookListView,
-    BookSearchView,
     BookUpdateView,
+    create_author
 )
 
 
@@ -17,5 +17,7 @@ urlpatterns = [
     path('<int:pk>/', BookDetailView.as_view(), name='book-view'),
     path('<int:pk>/delete/', BookDeleteView.as_view(), name='book-delete'),
     path('<int:pk>/update/', BookUpdateView.as_view(), name='book-update'),
-    path('author-check/', AuthorCheckView.as_view(), name='author-check'),
+    path('author-autocomplete/', AuthorAutocomplete.as_view(), name='author-autocomplete'),
+    path('create-author/', create_author, name='create-author'),
+
 ]

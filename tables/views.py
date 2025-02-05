@@ -1,10 +1,9 @@
 from django.urls import reverse_lazy
-from django.db.models import Count, Q, Prefetch
+from django.db.models import Q, Prefetch
 from django.http import JsonResponse, HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.views.generic import (
@@ -14,64 +13,27 @@ from django.views.generic import (
     ListView,
     UpdateView
 )
-from .forms import AuthorForm, BookForm
+from .forms import BookForm
 from .models import Author, Book, Category
+from dal import autocomplete
 
+class AuthorAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Author.objects.none()  # Restrict to logged-in users
+        qs = Author.objects.all()
+        if self.q:
+            qs = qs.filter(name__icontains=self.q)
+        return qs
 
-class AuthorCheckView(LoginRequiredMixin, View):
-    template_name = "tables/check_author.html"
+def create_author(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        if name:
+            author = Author.objects.create(name=name)
+            return JsonResponse({'id': author.id, 'text': author.name})
 
-    def get(self, request: HttpRequest) -> HttpResponse:
-        return render(request, self.template_name, {"form": AuthorForm()})
-
-    def post(self, request: HttpRequest) -> JsonResponse:
-        author_name = request.POST.get("author", "").strip()
-        authors = Author.objects.filter(name__icontains=author_name)
-
-        if not authors.exists():
-            return JsonResponse({"exists": False, "books": [], "authors": []})
-
-        authors_list = list(authors.values_list("name", flat=True))
-        books_by_author = {
-            author.name: list(author.book_set.values_list("title", flat=True))
-            for author in authors
-        }
-
-        return JsonResponse({
-            "exists": True,
-            "books": books_by_author,
-            "authors": authors_list
-        })
-
-
-class BookSearchView(LoginRequiredMixin, View):
-    template_name = "tables/check_universal.html"
-    def get(self, request: HttpRequest) -> HttpResponse:
-        return render(request, self.template_name, {"form": BookForm()})
-
-    def post(self, request: HttpRequest) -> JsonResponse:
-        search_text = request.POST.get("search-field", "").strip()
-        books = Book.objects.filter(
-            Q(title__icontains=search_text)
-            | Q(author__name__icontains=search_text)
-            | Q(publisher__name__icontains=search_text)
-            | Q(category__name__icontains=search_text)
-        ).distinct()
-
-        if not books.exists():
-            return JsonResponse({"exists": False, "books": []})
-
-        books_data = [
-            {
-                "title": book.title,
-                "authors": list(book.author.values_list("name", flat=True)),
-                "categories": list(book.category.values_list("name", flat=True)),
-                "publisher": book.publisher.name if book.publisher else "",
-            }
-            for book in books
-        ]
-
-        return JsonResponse({"exists": True, "books": books_data})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 class BookCreateView(LoginRequiredMixin, CreateView):
@@ -204,7 +166,6 @@ class BookListView(ListView):
             "selected_categories": [int(c) for c in self.request.GET.getlist("categories")],            
         }
         return context
-
 
 
 class BookUpdateView(LoginRequiredMixin, UpdateView):

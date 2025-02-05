@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load django_bootstrap5 %}
 {% load i18n %}
-
+{% block extra_head %}
+    <script src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+  {{ form.media }}
+{% endblock %}
 {% block content %}
 <h4>{% if is_create %}{% trans "Create book" %}{% else %}{% trans "Edit book" %}{% endif %}</h4>
 

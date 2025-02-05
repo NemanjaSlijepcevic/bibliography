@@ -5,14 +5,11 @@ from .models import (
     Book,
 )
 from datetime import date
-
-class AuthorForm(forms.ModelForm):
-    class Meta:
-        model = Author
-        fields = ['name']
-        labels = {'name': 'Name'}
+from dal import autocomplete
 
 class BookForm(forms.ModelForm):
+
+    
     class Meta:
         model = Book
         fields = [
@@ -25,6 +22,7 @@ class BookForm(forms.ModelForm):
         ]
 
         widgets = {
+            'author': autocomplete.ModelSelect2Multiple(url='books:author-autocomplete'),
             'category': forms.CheckboxSelectMultiple(),
         }
 
