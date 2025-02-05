@@ -14,17 +14,50 @@ from django.views.generic import (
     UpdateView
 )
 from .forms import BookForm
-from .models import Author, Book, Category
+from .models import (
+    Author,
+    Book,
+    Category,
+    Publisher,
+    Place,
+    Year
+)
 from dal import autocomplete
 
-class AuthorAutocomplete(autocomplete.Select2QuerySetView):
+class ModelAutocomplete(autocomplete.Select2QuerySetView):
+    model = None
+    name_field = 'name'
+
     def get_queryset(self):
+        if self.model is None:
+            raise ValueError("The 'model' attribute must be set on ModelAutocomplete subclasses.")
+
         if not self.request.user.is_authenticated:
-            return Author.objects.none()  # Restrict to logged-in users
-        qs = Author.objects.all()
+            return self.model.objects.none()
+
+        qs = self.model.objects.all()
+
         if self.q:
-            qs = qs.filter(name__icontains=self.q)
+            filter_kwargs = {f"{self.name_field}__icontains": self.q}
+            qs = qs.filter(**filter_kwargs)
         return qs
+
+
+class AuthorAutocomplete(ModelAutocomplete):
+    model = Author
+
+class CategoryAutocomplete(ModelAutocomplete):
+    model = Category
+
+class PlaceAutocomplete(ModelAutocomplete):
+    model = Place
+
+class PublisherAutocomplete(ModelAutocomplete):
+    model = Publisher
+
+class YearAutocomplete(ModelAutocomplete):
+    model = Year
+
 
 def create_author(request):
     if request.method == 'POST':

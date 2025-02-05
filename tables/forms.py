@@ -23,6 +23,9 @@ class BookForm(forms.ModelForm):
 
         widgets = {
             'author': autocomplete.ModelSelect2Multiple(url='books:author-autocomplete'),
+            'place': autocomplete.ModelSelect2(url='books:place-autocomplete'),
+            'publisher': autocomplete.ModelSelect2(url='books:publisher-autocomplete'),
+            'year': autocomplete.ModelSelect2(url='books:year-autocomplete'),
             'category': forms.CheckboxSelectMultiple(),
         }
 
