@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const paginateSelect = document.getElementById("paginateBy");
     const searchTextInput = document.querySelector('input[name="search-field"]');
     const resultContainer = document.getElementById("book-table-body");
+    const loginStatus = resultContainer.getAttribute("login_status") === "True";
     
     if (!form || !resultContainer || !categoryForm) {
         console.error("Missing required form elements!");
@@ -103,11 +104,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateTable(books) {
         resultContainer.innerHTML = books.length
-            ? books.map((book, index) => `
+            ? books.map((book, index) => 
+                `
                 <tr>
                     <td>${index + 1}</td>
                     <td>${book.authors.join(", ")}</td>
-                    <td><a href="${book.detail_url}">${book.title}</a></td>
+                    <td>${loginStatus ? `<a href="${book.detail_url}">${book.title}</a>` : book.title}</td>
                     <td>${book.publisher}</td>
                     <td>${book.place}</td>
                     <td>${book.year}</td>
@@ -116,6 +118,6 @@ document.addEventListener("DOMContentLoaded", function () {
             `).join('')
             : `<tr><td colspan="7">No books found</td></tr>`;
     }
-
+    
     fetchAndRenderBooks();
 });

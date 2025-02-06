@@ -61,7 +61,7 @@
                 <th scope="col" data-sort="tag">{% trans "Category" %}</th>
             </tr>
         </thead>
-        <tbody id="book-table-body">
+        <tbody id="book-table-body" login_status="{{ request.user.is_authenticated }}">
         </tbody>
     </table>
 </div>

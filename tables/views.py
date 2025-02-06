@@ -160,6 +160,7 @@ class BookListView(ListView):
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             books = self.get_queryset()
             paginate_by = request.GET.get("paginate_by", "10")
+            login = request.user.is_authenticated
 
             if paginate_by == "all":
                 page_obj = books
@@ -180,7 +181,7 @@ class BookListView(ListView):
                     "place": book.place.name if book.place else "" ,
                     "year": book.year.name if book.year else "" ,
                     "categories": [category.name for category in book.category.all()],
-                    "detail_url": book.get_absolute_url(),
+                    "detail_url": book.get_absolute_url() if login else "",
                 }
                 for book in page_obj
             ]
