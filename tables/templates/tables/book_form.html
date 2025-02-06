@@ -3,25 +3,32 @@
 {% load django_bootstrap5 %}
 {% load i18n %}
 {% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
     <script src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
   {{ form.media }}
 {% endblock %}
 {% block content %}
 <h4>{% if is_create %}{% trans "Create book" %}{% else %}{% trans "Edit book" %}{% endif %}</h4>
+<div class="pt-2">
+    <form method="POST" class="mb-3">
+        {% csrf_token %}
 
-<form method="POST" class="mb-3">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <div class="d-flex justify-content-between">
-        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-        {% if not is_create %}
-        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-            {% trans "Delete" %}
-        </button>
-        {% endif %}
-    </div>
-</form>
-
+        {% for field in form %}
+        <div class="field-wrapper">
+            <p><label for="{{ field.id_for_label }}"><b>{{ field.label }}</b></label></p>
+            <p>{{ field }}</p>
+        </div>
+        {% endfor %}
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+            {% if not is_create %}
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                {% trans "Delete" %}
+            </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
 {% if not is_create %}
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
