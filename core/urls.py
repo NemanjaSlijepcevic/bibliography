@@ -5,7 +5,7 @@ from .views import (
     UserDeleteView,
     UserDetailView,
     UserListView,
-    UserUpdateView
+    UserUpdateView,
 )
 
 
@@ -17,4 +17,6 @@ urlpatterns = [
     path('<int:pk>/delete/', UserDeleteView.as_view(), name='korisnik-delete'),
     path('<int:pk>/update/', UserUpdateView.as_view(), name='korisnik-update'),
     path('login/', auth_views.LoginView.as_view(), name='korisnik-login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='korisnici:korisnik-login'), name='korisnik-logout'),
+
 ]
