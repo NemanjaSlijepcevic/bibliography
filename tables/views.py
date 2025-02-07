@@ -38,8 +38,7 @@ class ModelAutocomplete(autocomplete.Select2QuerySetView):
         qs = self.model.objects.all()
 
         if self.q:
-            filter_kwargs = {f"{self.name_field}__icontains": self.q}
-            qs = qs.filter(**filter_kwargs)
+            qs = qs.filter(name__istartswith=self.q)
         return qs
 
 

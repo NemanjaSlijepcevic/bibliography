@@ -22,10 +22,36 @@ class BookForm(forms.ModelForm):
         ]
 
         widgets = {
-            'author': autocomplete.ModelSelect2Multiple(url='books:author-autocomplete'),
-            'place': autocomplete.ModelSelect2(url='books:place-autocomplete'),
-            'publisher': autocomplete.ModelSelect2(url='books:publisher-autocomplete'),
-            'year': autocomplete.ModelSelect2(url='books:year-autocomplete'),
+            'title': forms.TextInput(
+                attrs={
+                    'placeholder': _('Enter the book title...')
+                },
+            ),
+
+            'author': autocomplete.ModelSelect2Multiple(
+                url='books:author-autocomplete',
+                attrs={
+                    'data-placeholder': _('Write names of book authors...')
+                },
+            ),
+            'place': autocomplete.ModelSelect2(
+                url='books:place-autocomplete',
+                attrs={
+                    'data-placeholder': _('Write the place of book publication...')
+                },
+            ),
+            'publisher': autocomplete.ModelSelect2(
+                url='books:publisher-autocomplete',
+                attrs={
+                    'data-placeholder': _('Write a name of the book publisher...')
+                },
+            ),
+            'year': autocomplete.ModelSelect2(
+                url='books:author-autocomplete',
+                attrs={
+                    'data-placeholder': _('Write the publication year ...')
+                },
+            ),
             'category': forms.CheckboxSelectMultiple(),
         }
 

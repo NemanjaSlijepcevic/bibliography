@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-06 11:00+0100\n"
+"POT-Creation-Date: 2025-02-07 07:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,31 +19,51 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: .\tables\forms.py:33 .\tables\templates\tables\book_list.html:56
+#: .\tables\forms.py:27
+msgid "Enter the book title..."
+msgstr "Унеси наслов књиге..."
+
+#: .\tables\forms.py:34
+msgid "Write names of book authors..."
+msgstr "Унеси имена аутора..."
+
+#: .\tables\forms.py:40
+msgid "Write the place of book publication..."
+msgstr "Унеси место објављивања књиге..."
+
+#: .\tables\forms.py:46
+msgid "Write a name of the book publisher..."
+msgstr "Унеси име издавача књиге..."
+
+#: .\tables\forms.py:52
+msgid "Write the publication year ..."
+msgstr "Унеси годину издавања књиге..."
+
+#: .\tables\forms.py:59 .\tables\templates\tables\book_list.html:56
 msgid "Author"
 msgstr "Аутор"
 
-#: .\tables\forms.py:34 .\tables\templates\tables\book_list.html:57
+#: .\tables\forms.py:60 .\tables\templates\tables\book_list.html:57
 msgid "Title"
 msgstr "Наслов"
 
-#: .\tables\forms.py:35 .\tables\templates\tables\book_list.html:58
+#: .\tables\forms.py:61 .\tables\templates\tables\book_list.html:58
 msgid "Publisher"
 msgstr "Издавач"
 
-#: .\tables\forms.py:36 .\tables\templates\tables\book_list.html:59
+#: .\tables\forms.py:62 .\tables\templates\tables\book_list.html:59
 msgid "Place"
 msgstr "Место"
 
-#: .\tables\forms.py:37 .\tables\templates\tables\book_list.html:60
+#: .\tables\forms.py:63 .\tables\templates\tables\book_list.html:60
 msgid "Year"
 msgstr "Година"
 
-#: .\tables\forms.py:38 .\tables\templates\tables\book_list.html:61
+#: .\tables\forms.py:64 .\tables\templates\tables\book_list.html:61
 msgid "Category"
 msgstr "Област"
 
-#: .\tables\forms.py:46
+#: .\tables\forms.py:72
 msgid "Not a valid year"
 msgstr "Непостојећа година"
 
@@ -79,27 +99,27 @@ msgstr "Додај књигу"
 msgid "Edit book"
 msgstr "Измени књигу"
 
-#: .\tables\templates\tables\book_form.html:23
+#: .\tables\templates\tables\book_form.html:30
 msgid "Save"
 msgstr "Сачувај"
 
-#: .\tables\templates\tables\book_form.html:26
+#: .\tables\templates\tables\book_form.html:33
 msgid "Delete"
 msgstr "Обриши"
 
-#: .\tables\templates\tables\book_form.html:37
+#: .\tables\templates\tables\book_form.html:44
 msgid "Confirm delete"
 msgstr "Потврди брисање"
 
-#: .\tables\templates\tables\book_form.html:41
+#: .\tables\templates\tables\book_form.html:48
 msgid "Are you sure you want to delete "
 msgstr "Да ли си сигуран да желиш да обришеш "
 
-#: .\tables\templates\tables\book_form.html:44
+#: .\tables\templates\tables\book_form.html:51
 msgid "No"
 msgstr "Не"
 
-#: .\tables\templates\tables\book_form.html:45
+#: .\tables\templates\tables\book_form.html:52
 msgid "Yes"
 msgstr "Да"
 
@@ -119,11 +139,11 @@ msgstr "Провера"
 msgid "Select categories"
 msgstr "Изабери области"
 
-#: .\tables\views.py:95
+#: .\tables\views.py:94
 msgid "Book deleted successfully"
 msgstr "Књига је успешно обрисана."
 
-#: .\tables\views.py:97
+#: .\tables\views.py:96
 msgid "Book not found"
 msgstr "Књига није нађена."
 

@@ -10,7 +10,6 @@ from .views import (
     BookDetailView,
     BookListView,
     BookUpdateView,
-    create_author
 )
 
 
@@ -21,11 +20,9 @@ urlpatterns = [
     path('<int:pk>/', BookDetailView.as_view(), name='book-view'),
     path('<int:pk>/delete/', BookDeleteView.as_view(), name='book-delete'),
     path('<int:pk>/update/', BookUpdateView.as_view(), name='book-update'),
-    path('create-author/', create_author, name='create-author'),
-    path('author-autocomplete/', AuthorAutocomplete.as_view(), name='author-autocomplete'),
-    path('publisher-autocomplete/', PublisherAutocomplete.as_view(), name='publisher-autocomplete'),
-    path('category-autocomplete/', CategoryAutocomplete.as_view(), name='category-autocomplete'),
-    path('place-autocomplete/', PlaceAutocomplete.as_view(), name='place-autocomplete'),
-    path('year-autocomplete/', YearAutocomplete.as_view(), name='year-autocomplete'),
-
+    path('author-autocomplete/', AuthorAutocomplete.as_view(create_field='name', validate_create=True), name='author-autocomplete'),
+    path('publisher-autocomplete/', PublisherAutocomplete.as_view(create_field='name', validate_create=True), name='publisher-autocomplete'),
+    path('category-autocomplete/', CategoryAutocomplete.as_view(create_field='name', validate_create=True), name='category-autocomplete'),
+    path('place-autocomplete/', PlaceAutocomplete.as_view(create_field='name', validate_create=True), name='place-autocomplete'),
+    path('year-autocomplete/', YearAutocomplete.as_view(create_field='name', validate_create=True), name='year-autocomplete'),
 ]
