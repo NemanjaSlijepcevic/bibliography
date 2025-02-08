@@ -28,7 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-LOGIN_URL = '/korisnici/login/'
+LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/book/'
 LOGOUT_REDIRECT_URL = '/book/'
 

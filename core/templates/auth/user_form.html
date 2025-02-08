@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
+{% load i18n %}
 
 {% block content %}
-<h4>{% if is_create %}Додај{% else %}Измени{% endif %} корисника</h4>
-
+<h4>{% if is_create %}{% trans 'Add' %}{% else %}{% trans 'Edit' %}{% endif %} {% trans 'user' %}</h4>
 <form method="POST" class="mb-3">
     {% csrf_token %}
     {% bootstrap_form form %}
     <div class="d-flex justify-content-between">
-        <button type="submit" class="btn btn-primary">Сачувај</button>
-        {% if not is_create %}
+        <button type="submit" class="btn btn-primary">{% trans 'Save' %}</button>
+        {% if not is_create and request.user.is_superuser %}
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-            Обриши
+            {% trans 'Delete' %}
         </button>
         {% endif %}
     </div>
@@ -22,15 +22,15 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Потврди брисање</h5>
+                <h5 class="modal-title" id="deleteModalLabel">{% trans 'Confirm delete' %}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Да ли си сигуран да желиш да корисника "{{ object.username }}"?
+                {% blocktrans %}Are you sure you want to delete {% endblocktrans %} "{{object.title}}"?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Не</button>
-                <button type="button" id="confirmDelete" class="btn btn-danger">Да</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans 'No' %}</button>
+                <button type="button" id="confirmDelete" class="btn btn-danger">{% trans 'Yes' %}</button>
             </div>
         </div>
     </div>
@@ -38,7 +38,7 @@
 
 <script>
     document.getElementById('confirmDelete').addEventListener('click', function () {
-        const deleteUrl = `{% url 'korisnici:korisnik-delete' pk=object.pk %}`;
+        const deleteUrl = `{% url 'users:user-delete' pk=object.pk %}`;
         fetch(deleteUrl, {
             method: 'POST',
             headers: {
@@ -48,7 +48,7 @@
         })
         .then(response => {
             if (response.ok) {
-                window.location.href = "{% url 'korisnici:korisnik-list' %}";
+                window.location.href = "{% url 'users:user-list' %}";
             } else {
                 return response.text().then(text => { throw new Error(text); });
             }

@@ -2,14 +2,12 @@ from django.urls import reverse_lazy
 from django.db.models import Q, Prefetch
 from django.http import JsonResponse, HttpRequest, HttpResponse
 from django.shortcuts import render
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.paginator import Paginator
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
     CreateView,
     DeleteView,
-    DetailView,
     ListView,
     UpdateView
 )
@@ -23,6 +21,8 @@ from .models import (
     Year
 )
 from dal import autocomplete
+from .utils import user_in_group
+
 
 class ModelAutocomplete(autocomplete.Select2QuerySetView):
     model = None
@@ -58,17 +58,7 @@ class YearAutocomplete(ModelAutocomplete):
     model = Year
 
 
-def create_author(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        if name:
-            author = Author.objects.create(name=name)
-            return JsonResponse({'id': author.id, 'text': author.name})
-
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
-class BookCreateView(LoginRequiredMixin, CreateView):
+class BookCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Book
     form_class = BookForm
     success_url = reverse_lazy("books:book-create")
@@ -83,7 +73,13 @@ class BookCreateView(LoginRequiredMixin, CreateView):
         context["is_create"] = True
         return context
 
-class BookDeleteView(LoginRequiredMixin, DeleteView):
+    def test_func(self):
+        return user_in_group(self.request.user, "Add")
+
+    def handle_no_permission(self):
+        raise PermissionDenied
+
+class BookDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Book
     success_url = reverse_lazy("books:book-list")
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -98,8 +94,11 @@ class BookDeleteView(LoginRequiredMixin, DeleteView):
                 return JsonResponse({"error": str(e)}, status=500)
         return super().dispatch(request, *args, **kwargs)
 
-class BookDetailView(DetailView):
-    model = Book
+    def test_func(self):
+        return user_in_group(self.request.user, "Delete")
+
+    def handle_no_permission(self):
+        raise PermissionDenied
 
 class BookListView(ListView):
     model = Book
@@ -187,6 +186,7 @@ class BookListView(ListView):
 
             return JsonResponse({
                 "books": data,
+                "can_edit" : self.request.user.is_superuser or self.request.user.groups.filter(name="Edit").exists(),  
                 "has_next": getattr(page_obj, "has_next", lambda: False)(),
                 "current_page": getattr(page_obj, "number", 1),
                 "total_pages": total_pages
@@ -196,12 +196,12 @@ class BookListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs) | {
             "categories": Category.objects.all(),
-            "selected_categories": [int(c) for c in self.request.GET.getlist("categories")],            
+            "selected_categories": [int(c) for c in self.request.GET.getlist("categories")],
         }
         return context
 
 
-class BookUpdateView(LoginRequiredMixin, UpdateView):
+class BookUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Book
     form_class = BookForm
     success_url = reverse_lazy("books:book-list")
@@ -215,3 +215,9 @@ class BookUpdateView(LoginRequiredMixin, UpdateView):
             "is_create": False,
             "object": self.get_object(),
         }
+
+    def test_func(self):
+        return user_in_group(self.request.user, "Edit")
+
+    def handle_no_permission(self):
+        raise PermissionDenied

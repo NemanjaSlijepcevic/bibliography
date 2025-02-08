@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const paginateSelect = document.getElementById("paginateBy");
     const searchTextInput = document.querySelector('input[name="search-field"]');
     const resultContainer = document.getElementById("book-table-body");
-    const loginStatus = resultContainer.getAttribute("login_status") === "True";
     
     if (!form || !resultContainer || !categoryForm) {
         console.error("Missing required form elements!");
@@ -75,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.json())
         .then(data => {
-            updateTable(data.books);
+            updateTable(data.books, data.can_edit);
             updatePagination(
                 document.getElementById("pagination-container"),
                 data.has_next,
@@ -102,14 +101,14 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("book-table").classList.remove("loading");
     }
 
-    function updateTable(books) {
+    function updateTable(books, can_edit) {
         resultContainer.innerHTML = books.length
             ? books.map((book, index) => 
                 `
                 <tr>
                     <td>${index + 1}</td>
                     <td>${book.authors.join(", ")}</td>
-                    <td>${loginStatus ? `<a href="${book.detail_url}">${book.title}</a>` : book.title}</td>
+                    <td>${can_edit ? `<a href="${book.detail_url}">${book.title}</a>` : book.title}</td>
                     <td>${book.publisher}</td>
                     <td>${book.place}</td>
                     <td>${book.year}</td>

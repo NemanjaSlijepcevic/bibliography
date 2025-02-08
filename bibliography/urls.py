@@ -23,7 +23,7 @@ urlpatterns = [
     path('',  BookListView.as_view(), name='home'),
     path('admin/', admin.site.urls),
     path('book/', include('tables.urls')),
-    path('korisnici/', include('core.urls')),
+    path('users/', include('core.urls')),
 ]
 
 # add debug toolbar in urlpatterns

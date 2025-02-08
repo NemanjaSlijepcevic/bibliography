@@ -47,7 +47,7 @@ class BookForm(forms.ModelForm):
                 },
             ),
             'year': autocomplete.ModelSelect2(
-                url='books:author-autocomplete',
+                url='books:year-autocomplete',
                 attrs={
                     'data-placeholder': _('Write the publication year ...')
                 },
