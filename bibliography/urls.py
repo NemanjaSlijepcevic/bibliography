@@ -16,11 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic.base import RedirectView
 import bibliography.settings
-from tables.views import  BookListView
 
 urlpatterns = [
-    path('',  BookListView.as_view(), name='home'),
+    path('', RedirectView.as_view(pattern_name='users:user-login')),
     path('admin/', admin.site.urls),
     path('book/', include('tables.urls')),
     path('users/', include('core.urls')),
