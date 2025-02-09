@@ -58,10 +58,19 @@ class YearAutocomplete(ModelAutocomplete):
     model = Year
 
 
-class BookCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class UserPassesGroupTest(UserPassesTestMixin):
+    request_group = ''
+    def test_func(self):
+        return user_in_group(self.request.user, self.request_group)
+
+    def handle_no_permission(self):
+        raise PermissionDenied
+
+class BookCreateView(LoginRequiredMixin, UserPassesGroupTest, CreateView):
     model = Book
     form_class = BookForm
     success_url = reverse_lazy("books:book-create")
+    request_group = "Add"
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -73,14 +82,11 @@ class BookCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         context["is_create"] = True
         return context
 
-    def test_func(self):
-        return user_in_group(self.request.user, "Add")
 
-    def handle_no_permission(self):
-        raise PermissionDenied
 
-class BookDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class BookDeleteView(LoginRequiredMixin, UserPassesGroupTest, DeleteView):
     model = Book
+    request_group = "Delete"
     success_url = reverse_lazy("books:book-list")
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -93,12 +99,6 @@ class BookDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             except Exception as e:
                 return JsonResponse({"error": str(e)}, status=500)
         return super().dispatch(request, *args, **kwargs)
-
-    def test_func(self):
-        return user_in_group(self.request.user, "Delete")
-
-    def handle_no_permission(self):
-        raise PermissionDenied
 
 class BookListView(ListView):
     model = Book
@@ -201,9 +201,10 @@ class BookListView(ListView):
         return context
 
 
-class BookUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class BookUpdateView(LoginRequiredMixin, UserPassesGroupTest, UpdateView):
     model = Book
     form_class = BookForm
+    request_group = "Edit"
     success_url = reverse_lazy("books:book-list")
 
     def form_valid(self, form):
@@ -215,9 +216,3 @@ class BookUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             "is_create": False,
             "object": self.get_object(),
         }
-
-    def test_func(self):
-        return user_in_group(self.request.user, "Edit")
-
-    def handle_no_permission(self):
-        raise PermissionDenied
