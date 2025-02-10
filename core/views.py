@@ -2,8 +2,8 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.views import LoginView
-from .forms import SignupForm
+from django.contrib.auth.views import LoginView, PasswordChangeView
+from .forms import SignupForm, UserEditForm
 from django.contrib.auth.models import User, Group
 from django.views.generic import (
     CreateView,
@@ -12,7 +12,22 @@ from django.views.generic import (
     UpdateView
 )
 
-class UserCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class SuperUserRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        raise PermissionDenied
+
+class UserRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        obj = self.get_object()
+        return self.request.user.is_superuser or self.request.user.pk == obj.pk
+
+    def handle_no_permission(self):
+        raise PermissionDenied
+
+class UserCreateView(LoginRequiredMixin, SuperUserRequiredMixin, CreateView):
     model = User
     form_class = SignupForm
     success_url = reverse_lazy("users:user-create")
@@ -29,14 +44,8 @@ class UserCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         context['is_create'] = True
         return context
 
-    def test_func(self):
-        return self.request.user.is_superuser
 
-    def handle_no_permission(self):
-        raise PermissionDenied
-
-
-class UserDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class UserDeleteView(LoginRequiredMixin, SuperUserRequiredMixin, DeleteView):
     model = User
     success_url = reverse_lazy("users:user-list")
     def dispatch(self, request, *args, **kwargs):
@@ -46,21 +55,9 @@ class UserDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return JsonResponse({"message": "User deleted successfully"}, status=200)
         return super().dispatch(request, *args, **kwargs)
 
-    def test_func(self):
-        return self.request.user.is_superuser
 
-    def handle_no_permission(self):
-        raise PermissionDenied
-
-
-class UserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class UserListView(LoginRequiredMixin, SuperUserRequiredMixin, ListView):
     model = User
-
-    def test_func(self):
-        return self.request.user.is_superuser
-
-    def handle_no_permission(self):
-        raise PermissionDenied
 
 class UserLoginView(LoginView):
     def dispatch(self, request, *args, **kwargs):
@@ -71,10 +68,13 @@ class UserLoginView(LoginView):
     def get_success_url(self):
         return reverse_lazy("books:book-list") 
 
-class UserUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class UserPasswordView(PasswordChangeView, UserRequiredMixin):
+    template_name = 'registration/password.html'
+    success_url = reverse_lazy('users:user-update')
+
+class UserUpdateView(LoginRequiredMixin, UserRequiredMixin, UpdateView):
     model = User
-    form_class = SignupForm
-    success_url = reverse_lazy("users:user-list")
+    form_class = UserEditForm
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -83,8 +83,6 @@ class UserUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.edited_by = self.request.user
-
-        print(form)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -93,10 +91,7 @@ class UserUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         context['object'] = self.get_object()
         return context
 
-    def test_func(self):
-        return self.request.user.is_superuser
-
-    def handle_no_permission(self):
-        raise PermissionDenied
-
-       
+    def get_success_url(self):
+        if self.request.user.is_superuser:
+            return reverse_lazy("users:user-list")
+        return reverse_lazy("users:user-update", kwargs={self.request.user.pk})
