@@ -29,7 +29,7 @@
         {% endfor %}
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-            {% if user|in_group:"Delete" %}
+            {% if not is_create and user|in_group:"Delete" %}
             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
                 {% trans "Delete" %}
             </button>

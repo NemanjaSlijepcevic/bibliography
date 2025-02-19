@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+from os import getenv
 from pathlib import Path
 from django.utils.translation import gettext as _
 
@@ -21,12 +21,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^l1fx@puo!r-ip2+dct1m1!2dt51f&v^d+_t^+s7+-x&f(4wdm'
+SECRET_KEY = getenv('SECRET_KEY', 'django-insecure-^l1fx@puo!r-ip2+dct1m1!2dt51f&v^d+_t^+s7+-x&f(4wdm')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = str(getenv('DEBUG', 'false')).lower() == "true" or True
+DEFAULT_DOMAIN = getenv('DEFAULT_DOMAIN', 'localhost')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    DEFAULT_DOMAIN
+]
 
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/book/'
@@ -50,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -128,7 +133,13 @@ LOCALE_PATHS = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATIC_URL = 'static/'
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -136,6 +147,9 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 if DEBUG:
+    ALLOWED_HOSTS += [
+        "127.0.0.1"
+    ]
     MIDDLEWARE += [
         'debug_toolbar.middleware.DebugToolbarMiddleware',
     ]

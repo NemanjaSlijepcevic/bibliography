@@ -102,7 +102,7 @@ class BookDeleteView(LoginRequiredMixin, UserPassesGroupTest, DeleteView):
 
 class BookListView(ListView):
     model = Book
-    paginate_by = 10
+    paginate_by = 25
 
     def get_queryset(self):
         queryset = Book.objects.all()
@@ -143,15 +143,11 @@ class BookListView(ListView):
             if order == "desc":
                 sort_field = f"-{sort_field}"
             queryset = queryset.order_by(sort_field)
-            print(sort_mapping)
-            print(queryset)
 
-        print('Prefetch')
         queryset = queryset.prefetch_related(
             Prefetch('author', queryset=Author.objects.only('name')),
             Prefetch('category', queryset=Category.objects.only('name')),
         ).select_related('publisher', 'place', 'year')
-        print(queryset)
         return queryset
 
     def get(self, request, *args, **kwargs):
