@@ -4,7 +4,8 @@ from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from .forms import SignupForm, UserEditForm
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -12,12 +13,14 @@ from django.views.generic import (
     UpdateView
 )
 
+
 class SuperUserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_superuser
 
     def handle_no_permission(self):
         raise PermissionDenied
+
 
 class UserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -27,17 +30,18 @@ class UserRequiredMixin(UserPassesTestMixin):
     def handle_no_permission(self):
         raise PermissionDenied
 
+
 class UserCreateView(LoginRequiredMixin, SuperUserRequiredMixin, CreateView):
     model = User
     form_class = SignupForm
     success_url = reverse_lazy("users:user-create")
-    permission_required = 'auth.change_user'  # Requires 'change_user' permission
+    permission_required = 'auth.change_user'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['is_superuser'] = self.request.user.is_superuser
         return kwargs
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_superuser'] = self.request.user.is_superuser
@@ -48,6 +52,7 @@ class UserCreateView(LoginRequiredMixin, SuperUserRequiredMixin, CreateView):
 class UserDeleteView(LoginRequiredMixin, SuperUserRequiredMixin, DeleteView):
     model = User
     success_url = reverse_lazy("users:user-list")
+
     def dispatch(self, request, *args, **kwargs):
         if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
             self.object = self.get_object()
@@ -59,6 +64,7 @@ class UserDeleteView(LoginRequiredMixin, SuperUserRequiredMixin, DeleteView):
 class UserListView(LoginRequiredMixin, SuperUserRequiredMixin, ListView):
     model = User
 
+
 class UserLoginView(LoginView):
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -66,11 +72,13 @@ class UserLoginView(LoginView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy("books:book-list") 
+        return reverse_lazy("books:book-list")
+
 
 class UserPasswordView(PasswordChangeView, UserRequiredMixin):
     template_name = 'registration/password.html'
     success_url = reverse_lazy('users:user-update')
+
 
 class UserUpdateView(LoginRequiredMixin, UserRequiredMixin, UpdateView):
     model = User
@@ -94,4 +102,4 @@ class UserUpdateView(LoginRequiredMixin, UserRequiredMixin, UpdateView):
     def get_success_url(self):
         if self.request.user.is_superuser:
             return reverse_lazy("users:user-list")
-        return reverse_lazy("users:user-update", kwargs={self.request.user.pk})
+        return reverse_lazy("users:user-update", kwargs={"pk": self.request.user.pk})

@@ -1,7 +1,8 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User, Group
+
 
 class UserGroupsForm(forms.ModelForm):
     group_map = {
@@ -25,14 +26,14 @@ class UserGroupsForm(forms.ModelForm):
                 self.fields.pop(field)
 
         elif user_instance:
-            # Set initial values for group fields based on the user's group membership
+            # Set initial values for group fields based on the user membership
             for field, group_name in self.group_map.items():
                 self.fields[field].initial = self.instance.groups.filter(name=group_name).exists()
 
     def save(self, commit=True):
         user = super().save(commit=False)
 
-        if commit:
+        if commit or user.pk is None:
             user.save()
 
         # Assign user to groups based on form data
@@ -57,6 +58,7 @@ class SignupForm(UserCreationForm, UserGroupsForm):
             'password1',
             'password2',
         ]
+
 
 class UserEditForm(UserChangeForm, UserGroupsForm):
     class Meta:

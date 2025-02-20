@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 from os import getenv
 from pathlib import Path
-from django.utils.translation import gettext as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,11 +20,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = getenv('SECRET_KEY', 'django-insecure-^l1fx@puo!r-ip2+dct1m1!2dt51f&v^d+_t^+s7+-x&f(4wdm')
+SECRET_KEY = getenv(
+    'SECRET_KEY',
+    'django-insecure-^l1fx@puo!r-ip2+dct1m1!2dt51f&v^d+_t^+s7+-x&f(4wdm'
+)
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = str(getenv('DEBUG', 'false')).lower() == "true" or True
+DEBUG = str(getenv('DEBUG', 'false')).lower() == "true"
 DEFAULT_DOMAIN = getenv('DEFAULT_DOMAIN', 'localhost')
 
 ALLOWED_HOSTS = [

@@ -1,15 +1,12 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from .models import (
-    Author,
-    Book,
-)
+from .models import Book
 from datetime import date
 from dal import autocomplete
 
+
 class BookForm(forms.ModelForm):
 
-    
     class Meta:
         model = Book
         fields = [
@@ -61,7 +58,7 @@ class BookForm(forms.ModelForm):
             'publisher': _('Publisher'),
             'place': _('Place'),
             'year': _('Year'),
-            'category': _('Category')    
+            'category': _('Category')
         }
 
     def clean_year(self):

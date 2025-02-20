@@ -9,7 +9,8 @@ from tables.models import (
     Place,
     Publisher,
     Year
-) 
+)
+
 
 class Command(BaseCommand):
     help = 'Imports books from a JSON file'
@@ -29,7 +30,7 @@ class Command(BaseCommand):
                     place, created = Place.objects.get_or_create(name=item['mesto'])
                     year = item['godina']
                     if year == '':
-                        year = null
+                        year = None
                     year, created = Year.objects.get_or_create(name=year)
 
                     book = Book(
@@ -47,7 +48,6 @@ class Command(BaseCommand):
                         category, created = Category.objects.get_or_create(name=category_name)
                         category_objects.append(category)
 
-
                     book.category.set(category_objects)
 
                 except ObjectDoesNotExist as e:
@@ -56,7 +56,7 @@ class Command(BaseCommand):
                     self.stderr.write(f"Unexpected error with {item.get('naziv', 'Unknown')} - {e}")
 
             self.stdout.write(self.style.SUCCESS('Books successfully imported!'))
-        
+
         except FileNotFoundError as e:
             self.stderr.write(f"File not found: {e}")
         except json.JSONDecodeError as e:

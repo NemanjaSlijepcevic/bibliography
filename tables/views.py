@@ -1,10 +1,10 @@
 from django.urls import reverse_lazy
 from django.db.models import Q, Prefetch
 from django.http import JsonResponse, HttpRequest, HttpResponse
-from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.paginator import Paginator
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -45,14 +45,18 @@ class ModelAutocomplete(autocomplete.Select2QuerySetView):
 class AuthorAutocomplete(ModelAutocomplete):
     model = Author
 
+
 class CategoryAutocomplete(ModelAutocomplete):
     model = Category
+
 
 class PlaceAutocomplete(ModelAutocomplete):
     model = Place
 
+
 class PublisherAutocomplete(ModelAutocomplete):
     model = Publisher
+
 
 class YearAutocomplete(ModelAutocomplete):
     model = Year
@@ -60,11 +64,13 @@ class YearAutocomplete(ModelAutocomplete):
 
 class UserPassesGroupTest(UserPassesTestMixin):
     request_group = ''
+
     def test_func(self):
         return user_in_group(self.request.user, self.request_group)
 
     def handle_no_permission(self):
         raise PermissionDenied
+
 
 class BookCreateView(LoginRequiredMixin, UserPassesGroupTest, CreateView):
     model = Book
@@ -76,18 +82,17 @@ class BookCreateView(LoginRequiredMixin, UserPassesGroupTest, CreateView):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["is_create"] = True
         return context
 
 
-
 class BookDeleteView(LoginRequiredMixin, UserPassesGroupTest, DeleteView):
     model = Book
     request_group = "Delete"
     success_url = reverse_lazy("books:book-list")
+
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
             try:
@@ -99,6 +104,7 @@ class BookDeleteView(LoginRequiredMixin, UserPassesGroupTest, DeleteView):
             except Exception as e:
                 return JsonResponse({"error": str(e)}, status=500)
         return super().dispatch(request, *args, **kwargs)
+
 
 class BookListView(ListView):
     model = Book
@@ -125,7 +131,6 @@ class BookListView(ListView):
 
         if categories and search_text:
             queryset = queryset.distinct()
-
 
         sort_column = self.request.GET.get("sort", "id")
         order = self.request.GET.get("order", "asc")
@@ -172,8 +177,8 @@ class BookListView(ListView):
                     "title": book.title,
                     "authors": [author.name for author in book.author.all()],
                     "publisher": book.publisher.name if book.publisher else "",
-                    "place": book.place.name if book.place else "" ,
-                    "year": book.year.name if book.year else "" ,
+                    "place": book.place.name if book.place else "",
+                    "year": book.year.name if book.year else "",
                     "categories": [category.name for category in book.category.all()],
                     "detail_url": book.get_absolute_url() if login else "",
                 }
@@ -182,13 +187,13 @@ class BookListView(ListView):
 
             return JsonResponse({
                 "books": data,
-                "can_edit" : self.request.user.is_superuser or self.request.user.groups.filter(name="Edit").exists(),  
+                "can_edit": self.request.user.is_superuser or self.request.user.groups.filter(name="Edit").exists(),  # noqa: E501
                 "has_next": getattr(page_obj, "has_next", lambda: False)(),
                 "current_page": getattr(page_obj, "number", 1),
                 "total_pages": total_pages
             }, safe=False)
         return super().get(request, *args, **kwargs)
-  
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs) | {
             "categories": Category.objects.all(),

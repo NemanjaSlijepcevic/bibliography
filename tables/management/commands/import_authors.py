@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from tables.models import Book, Author
 
+
 class Command(BaseCommand):
     help = "Restore authors from an old SQLite database based on matching book titles."
 
@@ -15,14 +16,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         backup_db_path = options['backup_db_path']
-        
+
         self.stdout.write(self.style.NOTICE(f"Connecting to backup database: {backup_db_path}"))
         try:
             backup_conn = sqlite3.connect(backup_db_path)
         except sqlite3.Error as e:
             self.stderr.write(f"Error connecting to backup database: {e}")
             return
-        
+
         try:
             with transaction.atomic():
                 cursor = backup_conn.cursor()
@@ -39,7 +40,7 @@ class Command(BaseCommand):
                             self.style.WARNING(f"Skipping '{title}' - multiple books share this title.")
                         )
                         continue
-                    
+
                     # Proceed if there's exactly one match
                     try:
                         book = matching_books.get()
@@ -53,7 +54,7 @@ class Command(BaseCommand):
                     if not author_data:
                         self.stdout.write(self.style.WARNING(f"Author not found for title: {title}"))
                         continue
-                    
+
                     author_name = author_data[0]
 
                     # Find or create the Author in the current database
@@ -63,7 +64,9 @@ class Command(BaseCommand):
 
                     # Add the author to the book's many-to-many relationship
                     book.author.add(author)
-                    self.stdout.write(self.style.SUCCESS(f"Restored author '{author_name}' to book '{title}'"))
+                    self.stdout.write(
+                        self.style.SUCCESS(f"Restored author '{author_name}' to book '{title}'")
+                    )
 
                 self.stdout.write(self.style.SUCCESS("Author restoration completed successfully!"))
         except Exception as e:

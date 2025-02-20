@@ -9,6 +9,7 @@ django-bootstrap5 = "*"
 django-autocomplete-light = "*"
 gunicorn = "*"
 whitenoise = "*"
+flake8 = "*"
 
 [dev-packages]
 
