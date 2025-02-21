@@ -43,7 +43,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ secrets.DOCKER_NAMESPACE }}/${{ secrets.DOCKER_REPOSITORY }}
+            ${{ vars.DOCKER_NAMESPACE }}/${{ vars.DOCKER_REPOSITORY }}
             ghcr.io/${{ github.repository }}
           tags: |
             type=semver,pattern={{version}}
