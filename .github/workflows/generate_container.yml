@@ -50,7 +50,8 @@ jobs:
             type=raw,value=latest
             
       - name: Debug metadata
-        run: echo "Tags: ${{ steps.meta.outputs.tags }}"
+        run: |
+          echo "Tags: ${{ steps.meta.outputs.tags }}"
         
       - name: Build and push Docker image
         id: push
