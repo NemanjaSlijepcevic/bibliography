@@ -51,7 +51,7 @@ jobs:
             
       - name: Debug metadata
         run: |
-          echo "Tags: ${{ steps.meta.outputs.versioned_tags }}"
+          echo "Tags: ${{ steps.meta.outputs.tags }}"
         
       - name: Build and push Docker image
         id: push
@@ -59,7 +59,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.versioned_tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7,linux/386
       
