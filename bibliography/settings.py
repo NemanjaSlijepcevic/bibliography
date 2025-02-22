@@ -27,11 +27,15 @@ SECRET_KEY = getenv(
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = str(getenv('DEBUG', 'false')).lower() == "true"
+DEBUG = getenv("DEBUG", "false").strip().lower() in ("1", "true", "yes")
 DEFAULT_DOMAIN = getenv('DEFAULT_DOMAIN', 'localhost')
 
 ALLOWED_HOSTS = [
     DEFAULT_DOMAIN
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{DEFAULT_DOMAIN}",
 ]
 
 LOGIN_URL = '/users/login/'

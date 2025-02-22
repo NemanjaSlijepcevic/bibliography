@@ -19,6 +19,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Production stage
 FROM python:${PYTHON_VERSION}
 
+# Install gettext for translations
+RUN apk add --no-cache gettext
+
 # Copy the Python dependencies from the builder stage
 COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/python3.13/site-packages/
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
@@ -28,6 +31,9 @@ WORKDIR /app
 
 # Copy the rest of the application files
 COPY . .
+
+RUN python manage.py collectstatic --noinput && \
+    python manage.py compilemessages
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 
