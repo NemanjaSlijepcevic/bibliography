@@ -19,12 +19,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Production stage
 FROM python:${PYTHON_VERSION}
 
-# Create a non-root user
-RUN apk add --no-cache shadow && \
-    adduser -D -H -s /bin/sh -u 1000 librarian && \
-    mkdir /app && \
-    chown -R librarian:librarian /app
-
 # Copy the Python dependencies from the builder stage
 COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/python3.13/site-packages/
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
@@ -33,13 +27,10 @@ COPY --from=builder /usr/local/bin/ /usr/local/bin/
 WORKDIR /app
 
 # Copy the rest of the application files
-COPY --chown=librarian:librarian . .
+COPY . .
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 
-
-# Switch to non-root user
-USER librarian
 
 # Expose the port the app runs on
 EXPOSE 8000
