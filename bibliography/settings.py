@@ -29,6 +29,7 @@ SECRET_KEY = getenv(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv("DEBUG", "false").strip().lower() in ("1", "true", "yes")
 DEFAULT_DOMAIN = getenv('DEFAULT_DOMAIN', 'localhost')
+EXTRA_DOMAIN = getenv('EXTRA_DOMAIN', '')
 
 ALLOWED_HOSTS = [
     DEFAULT_DOMAIN
@@ -37,6 +38,10 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     f"https://{DEFAULT_DOMAIN}",
 ]
+
+if EXTRA_DOMAIN != '':
+    ALLOWED_HOSTS += [EXTRA_DOMAIN]
+    X_FRAME_OPTIONS = f"ALLOW-FROM https://{EXTRA_DOMAIN}/"
 
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/book/'
