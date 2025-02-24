@@ -49,28 +49,9 @@
   </nav>
 
   <script>
-    window.addEventListener('load', function () {
-        var iframe = document.getElementById('full-screen-iframe');
-
-        function adjustIframeHeight() {
-            // Check if the iframe's document is accessible
-            try {
-                var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                
-                // Get the body of the iframe
-                var iframeBody = iframeDoc.body;
-                
-                // Adjust the height of the iframe based on its content
-                iframe.style.height = iframeBody.scrollHeight + 'px';
-            } catch (e) {
-                console.error('Unable to access iframe content. It may be cross-origin.', e);
-            }
-        }
-
-        // Adjust the iframe height after the page loads
-        adjustIframeHeight();
-
-        // Listen for changes within the iframe (in case of pagination or dynamic content changes)
-        setInterval(adjustIframeHeight, 1000);  // Adjust every second (you can modify this interval)
-    });
-</script>
+    window.onload = function() {
+      if (window.top !== window.self) {
+        document.getElementById("navbar").style.display = "none";
+      }
+    };
+  </script>
