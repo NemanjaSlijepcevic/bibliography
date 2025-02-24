@@ -71,4 +71,14 @@
 
 {% block scripts %}
 <script type="module" src="{% static 'js/books.js' %}"></script>
+<script>
+    function sendHeight() {
+        const height = document.documentElement.scrollHeight;
+        window.parent.postMessage({ frameHeight: height }, "*");
+    }
+
+    window.addEventListener("load", sendHeight);
+    window.addEventListener("resize", sendHeight);
+    setInterval(sendHeight, 500); // Periodic check in case of dynamic content
+</script>
 {% endblock %}
