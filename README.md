@@ -17,5 +17,5 @@ A simple web application built with Django and MongoDB for managing bibliographi
 ## Tech Stack
 
 - **Backend:** Django (Python)
-- **Database:** MongoDB
+- **Database:** sqlite
 - **Dependencies Management:** `pip`
